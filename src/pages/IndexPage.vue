@@ -1,12 +1,18 @@
 <template>
   <q-page>
     <div v-if="!loading">
-      <div class="row text-center">
-        <Categories @submit="categorySelected" />
+      <div class="row">
+        <div class="col-6">
+          <Categories @submit="categorySelected" />
+        </div>
+        <div class="col-6 text-right q-pa-sm">
+          <q-btn color="primary" icon="search" @click="openDialogFilter" />
+          <DialogFilter ref="DialogFilterRef" @submit="changeColor" />
+        </div>
       </div>
       <div class="row">
         <div v-if="$q.screen.width > 600" class="col">
-          <!-- <Filter /> -->
+          <Filter />
         </div>
         <div class="col">
           <Products :products="products" :category="category" />
@@ -21,12 +27,12 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
 import { usuCallProductsStore } from "stores/callProducts";
 import Categories from "components/Categories.vue";
 import Filter from "components/Filter.vue";
 import Products from "components/Products.vue";
 import Pagination from "components/Pagination.vue";
+import DialogFilter from "components/dialogs/DialogFilter.vue";
 
 export default {
   name: "IndexPage",
@@ -41,6 +47,7 @@ export default {
     Filter,
     Products,
     Pagination,
+    DialogFilter,
   },
   props: {},
   data() {
@@ -50,6 +57,7 @@ export default {
       loading: true,
       n: 1,
       prev: 0,
+      colors: [],
     };
   },
   computed: {},
@@ -57,7 +65,11 @@ export default {
     async callApis(n) {
       await this.productStore.fetchProducts(n).then((res) => {
         this.products = res.data;
-        //250
+      });
+      this.products.forEach((product) => {
+        if (this.colors.indexOf(product.color) == -1) {
+          this.colors.push(product.color);
+        }
       });
       this.loading = false;
     },
@@ -68,15 +80,29 @@ export default {
 
     pagination(e) {
       this.prev = this.n;
-      if (e.value == "next") {
-        this.n = this.n + 1;
-      } else if (e.value == "prev" && this.n > 1) {
-        this.n = this.n - 1;
+      if (e.name == "direction") {
+        if (e.direction == "next") {
+          this.n = this.n + 1;
+        } else if (e.direction == "prev" && this.n > 1) {
+          this.n = this.n - 1;
+        }
+      } else if (e.name == "page") {
+        this.n = e.pageNum;
       }
+
       if (this.prev != this.n) {
         this.callApis(this.n);
         this.loading = true;
       }
+    },
+
+    changeColor(e) {
+      console.log(e);
+    },
+
+    openDialogFilter() {
+      this.$refs.DialogFilterRef.visible = true;
+      this.$refs.DialogFilterRef.colors = this.colors;
     },
   },
   mounted() {

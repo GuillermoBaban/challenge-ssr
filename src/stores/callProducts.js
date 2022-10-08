@@ -7,7 +7,7 @@ export const usuCallProductsStore = defineStore("products", {
   actions: {
     async fetchProducts(e) {
       return await api.get(
-        `http://api.devtoolstech.in/ecommerce/products?_page=${e}&_limit=20`
+        `http://api.devtoolstech.in/ecommerce/products?_page=${e}&_limit=17`
       );
     },
   },
