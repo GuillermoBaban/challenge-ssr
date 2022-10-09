@@ -70,6 +70,14 @@ export default {
       await this.productStore.fetchProducts(n).then((res) => {
         this.products = res.data;
       });
+      if (n.money_from > 0 || n.money_to > 0) this.from_filter = true;
+      else this.from_filter = false;
+      this.price_filter = this.products.filter((product) => {
+        if (n.money_from > 0 || n.money_to > 0) {
+          return product.price >= n.money_from && product.price <= n.money_to;
+        }
+      });
+      console.log(n);
       this.loading = false;
     },
 
@@ -98,14 +106,13 @@ export default {
     selectFilter(e) {
       this.callApis(e);
       this.loading = true;
-      if (e.money_from > 0 || e.money_to > 0) this.from_filter = true;
-      else this.from_filter = false;
-      this.price_filter = this.products.filter((product) => {
-        if (e.money_from > 0 || e.money_to > 0) {
-          console.log(e.money_from, e.money_to);
-          return product.price >= e.money_from || product.price <= e.money_to;
-        }
-      });
+      // if (e.money_from > 0 || e.money_to > 0) this.from_filter = true;
+      // else this.from_filter = false;
+      // this.price_filter = this.products.filter((product) => {
+      //   if (e.money_from > 0 || e.money_to > 0) {
+      //     return product.price >= e.money_from || product.price <= e.money_to;
+      //   }
+      // });
     },
 
     openDialogFilter() {

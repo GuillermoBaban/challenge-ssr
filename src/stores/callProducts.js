@@ -7,7 +7,7 @@ export const usuCallProductsStore = defineStore("products", {
   actions: {
     async fetchProducts(e) {
       return await api.get(
-        e.from_filter && e.from_filter != undefined
+        e.from_filter != undefined
           ? `http://api.devtoolstech.in/ecommerce/products?${
               (e.color ? `color=${e.color}&` : "") +
               (e.rating ? `rating=${e.rating}` : "")
