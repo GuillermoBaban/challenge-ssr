@@ -7,7 +7,7 @@
         </div>
         <div class="col-6 text-right q-pa-sm">
           <q-btn color="primary" icon="search" @click="openDialogFilter" />
-          <DialogFilter ref="DialogFilterRef" @submit="changeColor" />
+          <DialogFilter ref="DialogFilterRef" @submit="selectFilter" />
         </div>
       </div>
       <div class="row">
@@ -15,7 +15,10 @@
           <Filter />
         </div>
         <div class="col">
-          <Products :products="products" :category="category" />
+          <Products
+            :products="from_filter ? price_filter : products"
+            :category="category"
+          />
         </div>
       </div>
       <Pagination @submit="pagination" :pageNum="n" />
@@ -57,7 +60,8 @@ export default {
       loading: true,
       n: 1,
       prev: 0,
-      colors: [],
+      price_filter: null,
+      from_filter: false,
     };
   },
   computed: {},
@@ -65,11 +69,6 @@ export default {
     async callApis(n) {
       await this.productStore.fetchProducts(n).then((res) => {
         this.products = res.data;
-      });
-      this.products.forEach((product) => {
-        if (this.colors.indexOf(product.color) == -1) {
-          this.colors.push(product.color);
-        }
       });
       this.loading = false;
     },
@@ -96,13 +95,21 @@ export default {
       }
     },
 
-    changeColor(e) {
-      console.log(e);
+    selectFilter(e) {
+      this.callApis(e);
+      this.loading = true;
+      if (e.money_from > 0 || e.money_to > 0) this.from_filter = true;
+      else this.from_filter = false;
+      this.price_filter = this.products.filter((product) => {
+        if (e.money_from > 0 || e.money_to > 0) {
+          console.log(e.money_from, e.money_to);
+          return product.price >= e.money_from || product.price <= e.money_to;
+        }
+      });
     },
 
     openDialogFilter() {
       this.$refs.DialogFilterRef.visible = true;
-      this.$refs.DialogFilterRef.colors = this.colors;
     },
   },
   mounted() {

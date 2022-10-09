@@ -25,7 +25,7 @@
   </div>
 </template>
 <script>
-import { usuCallCategoriesStore } from "stores/callCategorys";
+import { usuCallCategoriesStore } from "stores/callCategories";
 export default {
   name: "Categories",
   setup() {

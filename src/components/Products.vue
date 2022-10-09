@@ -10,6 +10,7 @@
 
       <q-card-section>
         <div class="text-subtitle2 text-center">{{ product.name }}</div>
+        <div class="text-subtitle2 text-center">{{ product.color }}</div>
         <div class="text-center">
           <q-rating
             v-model="product.rating"
@@ -27,7 +28,7 @@
 </template>
 <script>
 export default {
-  name: "",
+  name: "Products",
   setup() {
     return {};
   },

@@ -6,11 +6,11 @@
         <div class="row q-gutter-sm">
           <div class="col">
             <div class="text-subtitle2 text-center">From</div>
-            <q-input outlined type="number" prefix="$" />
+            <q-input outlined type="number" prefix="$" v-model="money_from" />
           </div>
           <div class="col">
             <div class="text-subtitle2 text-center">To</div>
-            <q-input outlined type="number" prefix="$" />
+            <q-input outlined type="number" prefix="$" v-model="money_to" />
           </div>
         </div>
       </q-card-section>
@@ -23,7 +23,6 @@
               v-model="colorSelected"
               :val="color"
               :label="color"
-              @update:model-value="changeColor(color)"
             />
           </div>
         </div>
@@ -43,15 +42,28 @@
         </div>
       </q-card-section>
       <q-card-actions class="bg-white justify-around">
-        <q-btn color="primary" icon="mail" label="Search" v-close-popup />
-        <q-btn color="primary" icon="mail" label="Close" v-close-popup />
+        <q-btn color="primary" icon="close" label="Close" v-close-popup />
+        <q-btn
+          color="primary"
+          icon="mail"
+          label="Search"
+          @click="search"
+          v-close-popup
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 <script>
+import { usuCallColorsStore } from "stores/callColors";
 export default {
   name: "DialogFilter",
+  setup() {
+    const colorsStore = usuCallColorsStore();
+    return {
+      colorsStore,
+    };
+  },
   components: {},
   data() {
     return {
@@ -59,13 +71,36 @@ export default {
       colors: [],
       colorSelected: null,
       rating: 0,
+      money_from: 0,
+      money_to: 0,
     };
   },
   methods: {
-    changeColor(color) {
-      console.log(this.colorSelected);
+    search() {
+      this.$emit("submit", {
+        color: this.colorSelected,
+        rating: this.rating,
+        money_from: this.money_from,
+        money_to: this.money_to,
+        from_filter: true,
+      });
+    },
+
+    async callApis() {
+      let allProducts = [];
+      await this.colorsStore.fetchColors().then((res) => {
+        allProducts = res.data;
+      });
+      allProducts.forEach((product) => {
+        if (this.colors.indexOf(product.color) == -1) {
+          this.colors.push(product.color);
+        }
+      });
+      this.loading = false;
     },
   },
-  mounted() {},
+  mounted() {
+    this.callApis();
+  },
 };
 </script>
